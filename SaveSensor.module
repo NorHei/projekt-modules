@@ -1,0 +1,90 @@
+<?php namespace ProcessWire;
+
+/**
+ * Save Sensor Module
+ *
+ * Adds hooks to handle all the necessary steps that are needed to 
+ * save the Sensor template
+ * 
+ */
+
+class SaveSensor extends WireData implements Module {
+
+	/**
+	 * getModuleInfo is a module required by all modules to tell ProcessWire about them
+	 *
+	 * @return array
+	 *
+	 */
+	public static function getModuleInfo() {
+
+		return array(
+
+			// The module's title, typically a little more descriptive than the class name
+			'title' => 'Save actions for Sensor template', 
+
+			// version number 
+			'version' => "0.1.1", 
+
+			// summary is brief description of what this module is
+			'summary' => 'Simple module to manage save actions on template Sensor.',
+
+			// singular=true: indicates that only one instance of the module is allowed.
+			// This is usually what you want for modules that attach hooks. 
+			'singular' => true, 
+
+			// autoload=true: indicates the module should be started with ProcessWire.
+			// This is necessary for any modules that attach runtime hooks, otherwise those
+			// hooks won't get attached unless some other code calls the module on it's own.
+			// Note that autoload modules are almost always also 'singular' (seen above).
+			'autoload' => true, 
+		
+			// Optional font-awesome icon name, minus the 'fa-' part
+			//'icon' => 'smile-o', 
+			);
+	}
+
+	/**
+	 * Initialize the module
+	 *
+	 * ProcessWire calls this when the module is loaded. For 'autoload' modules, this will be called
+	 * when ProcessWire's API is ready. As a result, this is a good place to attach hooks. 
+	 *
+	 */
+	public function init() {
+
+		// add a hook after the $pages->save, to issue a notice every time a page is saved
+		$this->pages->addHookAfter('saveReady', $this, 'calculateSensor'); 	
+	}
+
+	/**
+	 * Example1 hooks into the pages->save method and displays a notice every time a page is saved
+	 * 
+	 * @param HookEvent $event
+	 *
+	 */
+	public function calculateSensor($event) {
+		// Fetch the recent page as it comes whith the $event
+		$page = $event->arguments(0);
+
+		// return if not relevant
+		if($page->template->name !== 'Sensor') return;
+
+		// Page title functions as a quicksearch field so most important stuff is stored here 
+		$page->title = "";
+		$page->title .= empty($page->naming) ?  'no naming ': $page->naming." ";
+		$page->title .= empty($page->sensor_room->title) ?  'no room ': $page->sensor_room->title." ";
+		$page->title .= empty($page->sensor_type->title) ?  'no room ': $page->sensor_type->title." ";
+		$page->title .= $page->active ?  'active ': "inactive ";
+
+		// Need code to check for warnings or escalation 
+
+		// Here comes Code for generating the Sensor Code later
+
+		
+	}
+
+
+	
+	
+}
