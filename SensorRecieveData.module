@@ -1,0 +1,50 @@
+<?php namespace ProcessWire;
+
+/**
+ * Sensor data reciever module/page
+ *
+ * This module creates an URL hook to recieve data from different sensors. 
+ * The Hook creates a page routing that pipes all incomming traffic to that URL to this module.   
+ */
+
+class SensorRecieveData extends WireData implements Module {
+
+	/**
+	 * getModuleInfo is a module required by all modules to tell ProcessWire about them
+	 *
+	 * @return array
+	 *
+	 */
+	public static function getModuleInfo() {
+
+		return array(
+
+			'title' => 'Sensor data reciever module/page', 
+			'version' => "0.1.2", 
+			'summary' => 'URL Hook whith funktionality to recieve sensor data.',
+			'singular' => true, 
+			'autoload' => true
+			);
+	}
+
+    /**  
+     *  This little hook does all the webpage routing to the recieve method.
+     *  
+     *  Init comes before ready so this comes before RedirOnMain  
+    */
+    public function Init() {
+		$this->pages->addHook('/reciever/', $this, 'recieveData'); 	
+    }
+
+    /**
+     * Recieve method get called when Hook is triggered
+     */
+    public function recieveData($event) {
+		
+        return 'Hello World';
+		
+
+		
+	}
+	
+}

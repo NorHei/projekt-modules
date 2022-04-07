@@ -3,7 +3,7 @@
 /**
  * Redirect on Main page
  *
- * As frontend Pages are not used we simpy gedirect to backend 
+ * As frontend Pages are not used we simply redirect to backend 
  * and force login as guest.  
  */
 
