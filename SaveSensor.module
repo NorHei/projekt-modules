@@ -77,6 +77,10 @@ class SaveSensor extends WireData implements Module {
 		$page->title .= empty($page->sensor_type->title) ?  'no room ': $page->sensor_type->title." ";
 		$page->title .= $page->active ?  'active ': "inactive ";
 
+		// We have multilanguage active but this is not needed as all are set when just setting title. 
+		//$page->title-default = $page->title;
+		//$page->title-deutsch = $page->title;
+
 		// Need code to check for warnings or escalation 
 
 		// Here comes Code for generating the Sensor Code later

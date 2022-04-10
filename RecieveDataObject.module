@@ -6,15 +6,15 @@
  * Still the application needs to do some additional checks, but a lot of crap is filtered out.  
  * In addition this class is used for testing the test Sensor class in recieve.php
  */
-class recieveDataObject extends WireData implements Module{
+class RecieveDataObject extends WireArray implements Module{
 
     // As this is a simple Data carrier, allmost  all properties stay public for easy iteration. 
       
     /** @var string $title */
-    public $title;
+    public $title="tztz";
     
     /** @var string $hash */
-    public $hash;
+    public $hash="jhjhjhjhj";
     
     /** @var float|int $tempValue */
     public $tempValue;
@@ -31,17 +31,6 @@ class recieveDataObject extends WireData implements Module{
     /** @var string $ipAddress*/
     public $ipAddress;
 
-    /** @var string $error*/
-    protected $error="" ;
-
-    // Getters
-    
-    **
-     * @return bool/string
-     */
-    public function getError() {
-        return $this->error;
-}
 
     /**
 	 * getModuleInfo is a module required by all modules to tell ProcessWire about them
@@ -54,63 +43,12 @@ class recieveDataObject extends WireData implements Module{
 
 			'title' => 'Data Object for recieving Sensor Data ', 
 			'version' => "0.1.3", 
-			'summary' => 'Fetches the Data Object from .',
+			'summary' => 'Fetches the Data.',
 			'singular' => false, 
-			'autoload' => false 
+			'autoload' => true 
 			);
 	}
 
-    /**
-     *  Constructor fetches Post and fills all Properties 
-     */
-    public function __construct(){
-
-        $jsonString = $input->post('jsonData'); 
-
-        // Nothing found so end it
-        if (empty($jsonString)) {
-            $this->error="!! jsonData not found or empty !! \n";
-            return;
-        }
-
-        // needed for check if all properties are filled
-        $cProperties = count((array)$classInstance);
-
-        // counter for filled properties
-        $cFilled = 0;
-
-        $classInstance = new DataObject();
-
-        $jsonArray = json_decode($jsonString);
-        
-        // fill properties whith data
-        foreach ($jsonArray as $key => $value) {
-            if (!property_exists($classInstance, $key)) continue;
-            $classInstance->{$key} = $value;
-            $cFilled++;
-        }
-        
-        // Inconsistent properties 
-        if ($cFilled == $cProperties ){
-            $error .= "Invalid properties filled: $cFilled  / Properties: $cProperties\n";
-        }
-
-        // Validation
-        $valiOut = $classInstance->basicValidation();
-        if(is_string($valiOut)) {
-            $error .= "Basic Validation failed!\n" ;
-            $error .= $valiOut;
-        }
-
-        // If all ok return the object
-        if (empty($error)){
-            $classInstance->basicSanitation();
-        }
-
-
-
-
-    }
     /**
      * Deserialize static method 
      * 
@@ -118,22 +56,23 @@ class recieveDataObject extends WireData implements Module{
      * it whith the attribures aqired from JSON string. If there are inconsintencies whith 
      * those attributes it will fail and return an empty object.
      * 
-     *  
-     * 
      *  @return object/string 
      */
     public static function Deserialize($jsonString)
     {   
+        
+        $classInstance = new RecieveDataObject();
+
+        return "doooo5:".print_r(wireCount($classInstance),true);
+
         // error String
-        $this->error="";
+        $error="";
         
         // needed for check if all properties are filled
-        $cProperties = count((array)$classInstance);
+        $countProperties = count((array)$classInstance);
 
         // counter for filled properties
-        $cFilled = 0;
-
-        $classInstance = new DataObject();
+        $countFieldsFilled = 0;
 
         $jsonArray = json_decode($jsonString);
         
@@ -141,35 +80,36 @@ class recieveDataObject extends WireData implements Module{
         foreach ($jsonArray as $key => $value) {
             if (!property_exists($classInstance, $key)) continue;
             $classInstance->{$key} = $value;
-            $cFilled++;
+            $countFieldsFilled++;
         }
         
         // Inconsistent properties 
-        if ($cFilled == $cProperties ){
-            $error .= "Invalid properties filled: $cFilled  / Properties: $cProperties\n";
+        if ($countFieldsFilled == $countProperties ){
+            $error .= "Invalid properties filled: $countFieldsFilled  / Properties: $countProperties\n";
         }
 
         // Validation
         $valiOut = $classInstance->basicValidation();
         if(is_string($valiOut)) {
-            $error .= "Basic Validation failed!\n" ;
             $error .= $valiOut;
         }
 
+        
         // If all ok return the object
         if (empty($error)){
             $classInstance->basicSanitation();
             return $classInstance;
         }
 
-        // concerning PHP manual its better to use both for garbage collection is faster that way. 
-        $classInstance = NULL;
-        unset($classInstance);
-
         // Return the error
         return $error;   
     } 
     
+    public function __construct(){
+            $this->hello="dfdf";
+            $this->bello="dfdf";
+
+    }
 
     /**
      * Basic Validation method
