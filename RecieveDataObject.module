@@ -6,7 +6,7 @@
  * Still the application needs to do some additional checks, but a lot of crap is filtered out.  
  * In addition this class is used for testing the test Sensor class in recieve.php
  */
-class RecieveDataObject extends WireArray implements Module{
+class RecieveDataObject extends WireData implements Module{
 
     // As this is a simple Data carrier, allmost  all properties stay public for easy iteration. 
       
@@ -63,7 +63,7 @@ class RecieveDataObject extends WireArray implements Module{
         
         $classInstance = new RecieveDataObject();
 
-        return "doooo5:".print_r(wireCount($classInstance),true);
+        return "doooo".print_r($classInstance->count,true);
 
         // error String
         $error="";
@@ -105,11 +105,6 @@ class RecieveDataObject extends WireArray implements Module{
         return $error;   
     } 
     
-    public function __construct(){
-            $this->hello="dfdf";
-            $this->bello="dfdf";
-
-    }
 
     /**
      * Basic Validation method
