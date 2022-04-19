@@ -48,7 +48,11 @@ class SaveSensor extends WireData implements Module {
 	 *
 	 * ProcessWire calls this when the module is loaded. For 'autoload' modules, this will be called
 	 * when ProcessWire's API is ready. As a result, this is a good place to attach hooks. 
-	 */
+     * 
+     * Initialize is also a good substitute for a constructor. In addition it has 
+     * all module based settings already loaded.
+    */
+
 	public function init() {
 
 		// add a hook after the $pages->save, to issue a notice every time a page is saved
@@ -71,23 +75,68 @@ class SaveSensor extends WireData implements Module {
 		// return if not relevant
 		if($page->template->name !== 'Sensor') return;
 
-		// Page title functions as a quicksearch field so most important stuff is stored here 
+
+ 
+       
+
+
+        // ////////////////////
+		// calculate fields
+ 
+        // Here we try to generate the C++ code for the sensors on auto pilot. 
+        // As this goes much to far for this projekt we just pull the basic code 
+        // from Type here as a placeholder. 
+        // Later we add a templating system that fills all placeholders with 
+        // all needed variables. Only do this if called from backend not CLI
+        // as cronjobs dont need to regenerate code.
+        if (!$this->isCli){
+            if (!empty($page->sensor_type->code)) 
+                $page->code = $page->sensor_type->code; 
+        }
+
+
+ 		// Page title functions as a quicksearch field so most important stuff is stored here 
 		$page->title = "";
 		$page->title .= empty($page->naming) ?  'no naming ': $page->naming." ";
 		$page->title .= empty($page->sensor_room->title) ?  'no room ': $page->sensor_room->title." ";
 		$page->title .= empty($page->sensor_type->title) ?  'no room ': $page->sensor_type->title." ";
 		$page->title .= $page->active ?  'active ': "inactive ";
-
-		// We have multilanguage active but this is not needed as all are set when just setting title. 
+ 
+        // We have multilanguage active but this is not needed as all are set when just setting title. 
 		//$page->title-default = $page->title;
 		//$page->title-deutsch = $page->title;
+     
 
-		// Need code to check for warnings or escalation 
-
-		// Here comes Code for generating the Sensor Code later
-
+        // Cannot activate if this is missing 
+        if (empty($page->naming))  $page->active = 0;
+        if ($page->sensor_room->count() == 0) $page->active = 0;
+        if ($page->sensor_type->count()==0) $page->active = 0;
+        
 		
 	}
+
+
+    /**
+    * function to check if we are running on CLI
+    *
+    * @return bool 
+    */
+    protected function isCli() {
+        if( defined('STDIN') )
+            {
+                return true;
+            }
+            
+            if( empty($_SERVER['REMOTE_ADDR']) and 
+                !isset($_SERVER['HTTP_USER_AGENT']) and 
+                count($_SERVER['argv']) > 0) 
+            {
+                return true;
+            } 
+            
+	    return false;
+        
+    }
 
 
 	

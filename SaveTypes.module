@@ -56,7 +56,10 @@ class SaveTypes extends WireData implements Module {
 
         // ////////////////////
 		// calculate fields
-   	
+        
+        //@TODO Add a check to avoid turning off types that have active Sensors  
+
+
 	}
 
 
