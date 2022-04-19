@@ -1,0 +1,64 @@
+<?php namespace ProcessWire;
+
+/**
+ * Save Dataset Module
+ *
+ * Adds hooks to handle all the necessary steps that are needed to 
+ * save the Dataset template
+ * 
+ * @attention: Please look into SaveSensor.module for even more detailed comments.
+ */
+
+class SaveDataset extends WireData implements Module {
+
+	/**
+	 * getModuleInfo required by module interface
+	 * @return array
+	 */
+	public static function getModuleInfo() {
+
+		return array(
+			'title' => 'Save actions for Dataset template', 
+			'version' => "0.1.1", 
+			'summary' => 'Simple module to manage save actions on template Dataset.',
+			'singular' => true, 
+			'autoload' => true, 
+			//'icon' => 'smile-o', 
+			);
+	}
+
+	/**
+	 * Initialize the module
+	 */
+	public function init() {
+		// add a hook after the $pages->save, to issue hook  every time a page is saved
+		$this->pages->addHookAfter('saveReady', $this, 'calculateDataset'); 	
+	}
+
+	/**
+	 * Hook for saving template Dataset 
+	 * 
+	 * @param HookEvent $event
+	 */
+	public function calculateDataset($event) {
+		$page = $event->arguments(0);
+        $settings= wire('pages')->get('/settings/');
+
+		// return if not relevant
+		if($page->template->name !== 'Dataset') return;
+
+        // ////////////////////
+        // set default values 
+
+        // ////////////////////
+        // Do Checks
+
+        // ////////////////////
+		// calculate fields
+   	
+	}
+
+
+	
+	
+}

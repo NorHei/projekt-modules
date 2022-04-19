@@ -1,0 +1,73 @@
+<?php namespace ProcessWire;
+
+/**
+ * SendOutWarlert Module
+ *
+ * Takes Care of sending out Messages for Co2 Alerts and Warnings 
+ * Simply extend the send method whith additional senders. 
+ * 
+ * 
+ */
+
+class SendOutWarlert extends WireData implements Module {
+
+    /** @var array $targets Targets to send to.*/
+    protected $targets;
+    
+    /** @var string $text Text to send*/
+    protected $text = "";
+
+    /** @var string $level use "warn" or "alert" */
+    $level = "warn"; 
+
+	/**
+	 * getModuleInfo required by module interface
+	 * @return array
+	 */
+	public static function getModuleInfo() {
+
+		return array(
+			'title' => 'Send out alerts and warnings', 
+			'version' => "0.1.1", 
+			'summary' => 'Takes care of sending out all alerts and warnings.',
+			'singular' => false, 
+			'autoload' => false, 
+			//'icon' => 'smile-o', 
+			);
+	}
+
+	/**
+	 * Initialize the module
+     * can be used as a substitute for _construct, but with module settings activated 
+	 */
+	public function init() {
+        // No hooks today
+	}
+
+	/**
+	 * Hook for saving template Room 
+	 * 
+	 * @param HookEvent $event
+	 */
+	public function calculateType($event) {
+		$page = $event->arguments(0);
+        $settings= wire('pages')->get('/settings/');
+
+		// return if not relevant
+		if($page->template->name !== 'Type') return;
+
+        // ////////////////////
+        // set default values 
+
+        // ////////////////////
+        // Do Checks
+
+        // ////////////////////
+		// calculate fields
+   	
+	}
+
+
+	
+	
+}
