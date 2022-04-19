@@ -1,0 +1,94 @@
+<?php namespace ProcessWire;
+
+/**
+ * Save Room Module
+ *
+ * Adds hooks to handle all the necessary steps that are needed to 
+ * save the Room template
+ * 
+ * @attention: Please look into SaveSensor.module for more detailed comments.
+ */
+
+class SaveRoom extends WireData implements Module {
+
+	/**
+	 * getModuleInfo required by module interface
+	 * @return array
+	 */
+	public static function getModuleInfo() {
+
+		return array(
+			'title' => 'Save actions for Room template', 
+			'version' => "0.1.1", 
+			'summary' => 'Simple module to manage save actions on template Room.',
+			'singular' => true, 
+			'autoload' => true, 
+			//'icon' => 'smile-o', 
+			);
+	}
+
+	/**
+	 * Initialize the module
+	 */
+	public function init() {
+
+		// add a hook after the $pages->save, to issue hook  every time a page is saved
+		$this->pages->addHookAfter('saveReady', $this, 'calculateRoom'); 	
+	}
+
+	/**
+	 * Hook for saving template Room 
+	 * 
+	 * @param HookEvent $event
+	 */
+	public function calculateRoom($event) {
+		$page = $event->arguments(0);
+        $settings= wire('pages')->get('/settings/');
+
+		// return if not relevant
+		if($page->template->name !== 'Room') return;
+
+        // ////////////////////
+        // set default values 
+
+        if (empty($page->height))          $page->height          = $settings->height;  
+        if (empty($page->co2_alarm_level)) $page->co2_alarm_level = $settings->co2_alarm_level;  
+        if (empty($page->co2_warn_level))  $page->co2_warn_level  = $settings->co2_warn_level;  
+        if (empty($page->temp_max_level))  $page->temp_max_level  = $settings->temp_max_level;  
+        if (empty($page->temp_min_level))  $page->temp_min_level  = $settings->temp_min_level;  
+
+
+        // ////////////////////
+        // Do Checks
+
+        if ($page->co2_alarm_level < $page->co2_warn_level){ 
+            $this->error("CO2 alarm level is bigger than CO2 warn level");
+        }
+
+        if ($page->person_curren < $page->person_max){ 
+            $this->error("Too many people in the room");
+        } 
+ 
+
+        // ////////////////////
+		// calculate fields
+
+        // As cubic meters is a Decimal field it cuts of the unneeded digits automatically. 
+		$page->cubic_meters = $page->square_meters * $page->height;
+
+        
+        // If there are no sensors , Instructors , you cannot activate the room
+        if ($page->room_instructor->count() == 0) $page->active = 0;
+        if ($page->room_sensors->count() == 0)     $page->active = 0;
+
+        if (!$page->active) $this->warning("ATTENTION: Room not active! You need an instructor and a sensor"); 
+        
+         
+
+   	
+	}
+
+
+	
+	
+}

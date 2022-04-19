@@ -1,0 +1,74 @@
+<?php namespace ProcessWire;
+
+/**
+ * Save Instructors Module
+ *
+ * Adds hooks to handle all the necessary steps that are needed to 
+ * save the Instructors template
+ * 
+ * @attention: Please look into SaveSensor.module for even more detailed comments.
+ */
+
+class SaveInstructors extends WireData implements Module {
+
+	/**
+	 * getModuleInfo required by module interface
+	 * @return array
+	 */
+	public static function getModuleInfo() {
+
+		return array(
+			'title' => 'Save actions for Instructors template', 
+			'version' => "0.1.1", 
+			'summary' => 'Simple module to manage save actions on template Instructors.',
+			'singular' => true, 
+			'autoload' => true, 
+			//'icon' => 'smile-o', 
+			);
+	}
+
+	/**
+	 * Initialize the module
+	 */
+	public function init() {
+
+		// add a hook after the $pages->save, to issue hook  every time a page is saved
+		$this->pages->addHookAfter('saveReady', $this, 'calculateInstructor'); 	
+	}
+
+	/**
+	 * Hook for saving template Room 
+	 * 
+	 * @param HookEvent $event
+	 */
+	public function calculateInstructor($event) {
+		$page = $event->arguments(0);
+        $settings= wire('pages')->get('/settings/');
+
+		// return if not relevant
+		if($page->template->name !== 'Instructor') return;
+
+        // ////////////////////
+        // set default values 
+
+        // ////////////////////
+        // Do Checks
+
+        // ////////////////////
+		// calculate fields
+
+ 		// Page title functions as a quicksearch field so most important stuff is stored here 
+		$page->title = "";
+		$page->title .= empty($page->naming) ?  'no naming ': $page->naming." ";
+		$page->title .= empty($page->phone_number) ?  'no phone ': $page->phone_number." ";
+		$page->title .= empty($page->teams_id) ?  'no teams ': $page->teams_id." ";  
+		$page->title .= empty($page->email) ?  'no email ': $page->email." ";
+		$page->title .= empty($page->instructor_room->title) ?  'no room ': $page->instructor_room->title." ";
+		$page->title .= $page->active ?  'active ': "inactive ";
+   	
+	}
+
+
+	
+	
+}
