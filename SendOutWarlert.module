@@ -1,4 +1,4 @@
-<?php namespace ProcessWire;
+<?php namespace ProcessWire;                         
 
 /**
  * SendOutWarlert Module
@@ -44,30 +44,37 @@ class SendOutWarlert extends WireData implements Module {
     /** @var array $targets Targets to send to.*/
     protected $targets;
     
+    /** @var string $headline Title to send*/
+    protected $headline = "";
+    
     /** @var string $text Text to send*/
     protected $text = "";
 
     /** @var string $level use "warn" or "alert" */
     protected $level = "warn"; 
  
-    ///////////////////////////////////
-    // Collectiion of Setters 
     
     /**
+     * 
+     *
      * @param WireObject $room
      * @param string $text
      * @param string $level
      * @return void
      */
-    public function send($text, $room, $level) {
+    public function send($headline, $text, $room, $level) {
             $this->room  = $room;
             $this->level = $level;
             $this->text  = $text;
+            $this->headline  = $headline;
             $this->findTargets();
-            if (!empty($targets))
-                $this->sendAll();
+            if (!empty($targets)) {
+                //$this->sendAll();
+            }
             else 
                 $this->error("Cannot send Warning no targets defined for Rooom: { $room->title}");
+  
+        return $this->targets;    
     }
  
 
@@ -75,17 +82,60 @@ class SendOutWarlert extends WireData implements Module {
 	 * Find the Targets to send to 
 	 */
 	protected function findTargets() {
-         	
+
+        // do we have instructors for this room ?
+        if ($this->room->room_instructor->count() != 0) {
+            foreach ($this->room->room_instructor as $inst) {
+                $this->targets[$inst->id] = array();
+                $this->targets[$inst->id]['teams'] = empty($inst->teams_id)     ? "" : $inst->teams_id;
+                $this->targets[$inst->id]['phone'] = empty($inst->phone_number) ? "" : $inst->phone_number;
+                $this->targets[$inst->id]['email'] = empty($inst->email)        ? "" : $inst->email;
+            }
+        }
+
+        // if we are on an alert , we inform all managers too
+        if ($this->level=="alert") {
+            $managers = $this->users->find('roles=manager');
+            print_r($managers);
+            if ($managers->count() != 0) {
+                foreach ($managers as $mana) {
+                    // instructors and user never can have the same page id 
+                    $this->targets[$mana->id] = array();
+                    $this->targets[$mana->id]['teams'] = empty($mana->teams_id)     ? "" : $mana->teams_id;
+                    $this->targets[$mana->id]['phone'] = empty($mana->phone_number) ? "" : $mana->phone_number;
+                    $this->targets[$mana->id]['email'] = empty($mana->email)        ? "" : $mana->email;
+                }
+            }  
+        }  	
 	}
     /**
 	 * Send to all available targets 
 	 */
 	protected function sendAll() {
 
-         	
+        foreach ($this->targets as $reciever){
+            // send email    
+            if (!empty($reciever['email'])){
+                // fetch object from module itself
+                $sender = wireMail();
+                $sender ->to($reciever['email'])
+                        ->subject($this->headline)
+                        ->body($this->text)
+                        ->send();
+            }            
+
+            // Send SMS
+            if (!empty($reciever['phone'])){
+                // SMS has no title field so combine
+                $text = $this->headline."\n\n";
+
+                // fetch from module factory
+                $sender = $modules->SendSms;
+                // Do sending
+                $response = $sender->sendMessage($text, $reciever['phone']);
+            } 
+
+            // No teams yet as teams is not prepared 
+        }
 	}
-
-
-	
-	
 }
