@@ -11,15 +11,6 @@
 
 class SendOutWarlert extends WireData implements Module {
 
-    /** @var array $targets Targets to send to.*/
-    protected $targets;
-    
-    /** @var string $text Text to send*/
-    protected $text = "";
-
-    /** @var string $level use "warn" or "alert" */
-    $level = "warn"; 
-
 	/**
 	 * getModuleInfo required by module interface
 	 * @return array
@@ -44,27 +35,54 @@ class SendOutWarlert extends WireData implements Module {
         // No hooks today
 	}
 
-	/**
-	 * Hook for saving template Room 
-	 * 
-	 * @param HookEvent $event
+    ///////////////////////////////////
+    // Additional Class Vars
+
+    /** @var WireObject $room Room to handle*/
+    protected $room;
+
+    /** @var array $targets Targets to send to.*/
+    protected $targets;
+    
+    /** @var string $text Text to send*/
+    protected $text = "";
+
+    /** @var string $level use "warn" or "alert" */
+    protected $level = "warn"; 
+ 
+    ///////////////////////////////////
+    // Collectiion of Setters 
+    
+    /**
+     * @param WireObject $room
+     * @param string $text
+     * @param string $level
+     * @return void
+     */
+    public function send($text, $room, $level) {
+            $this->room  = $room;
+            $this->level = $level;
+            $this->text  = $text;
+            $this->findTargets();
+            if (!empty($targets))
+                $this->sendAll();
+            else 
+                $this->error("Cannot send Warning no targets defined for Rooom: { $room->title}");
+    }
+ 
+
+ 	/**
+	 * Find the Targets to send to 
 	 */
-	public function calculateType($event) {
-		$page = $event->arguments(0);
-        $settings= wire('pages')->get('/settings/');
+	protected function findTargets() {
+         	
+	}
+    /**
+	 * Send to all available targets 
+	 */
+	protected function sendAll() {
 
-		// return if not relevant
-		if($page->template->name !== 'Type') return;
-
-        // ////////////////////
-        // set default values 
-
-        // ////////////////////
-        // Do Checks
-
-        // ////////////////////
-		// calculate fields
-   	
+         	
 	}
 
 

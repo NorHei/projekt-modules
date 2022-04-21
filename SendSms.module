@@ -1,0 +1,71 @@
+<?php namespace ProcessWire;
+
+/**
+ * Send Sms Module
+ *
+ *  Provides settings for Apikey + Sender  on Sms77 
+ *  And provides a method to actuallly send a Text Message via the Portal
+ */
+
+class SendSms extends WireData implements Module {
+
+	/**
+	 * getModuleInfo required by module interface
+	 * @return array
+	 */
+	public static function getModuleInfo() {
+
+		return array(
+			'title' => 'Module for sending SMS', 
+			'version' => "0.1.1", 
+			'summary' => 'Provides an Api to send out SMS via sms77.io.',
+			//'singular' => true, 
+			'autoload' => false, 
+			);
+	}
+
+	/**
+	 * Initialize the module
+	 */
+	public function init() {
+        // No hook today
+
+	}
+
+ 	/**
+	 * Actuallly send the message
+	*/   
+    public function sendMessage($text,$phone){
+
+        // Leading +
+        $phone = preg_replace("/^\+/", "00", $phone);
+        // remove non digit chars
+        $phone = preg_replace("/[^0-9]/", "", $phone);
+
+        // needed for SMS
+        $text= rawurlencode($text);
+
+        //call to send Sms
+        $call  = "https://gateway.sms77.io/api/sms?";
+        $call .= "p={$this->token}";      // From module settings  
+        $call .= "&to={$phone}";
+        $call .= "&text={$text}";
+        $call .= "&from={$this->sender}"; // From module settings
+
+        // Disable checking certificate to allow selfsigned
+        $arrContextOptions = array(
+            'ssl' => array(
+                'verify_peer'=>false,
+                'verify_peer_name'=>false,
+            ),
+        );  
+
+        // Send via HTML API of sms77.io
+        $response = file_get_contents($call, false, stream_context_create($arrContextOptions));
+ 
+        return $response;
+
+    }
+	
+	
+}

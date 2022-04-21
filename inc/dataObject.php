@@ -37,6 +37,8 @@ class dataObject {
      * it whith the attribures aqired from JSON string. If there are inconsintencies whith 
      * those attributes it will fail and return an empty object.
      * 
+     *  @param string $jsonString
+     *
      *  @return object/false 
      */
     public static function Deserialize($jsonString)
